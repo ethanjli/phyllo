@@ -2,7 +2,7 @@
 
 Phyllo is a point-to-point communication protocol suite and application framework specification designed for use with embedded systems.
 
-Phyllo provides a specification for high-throughput reliable asynchronous message exchange between exactly two (2) peers. Phyllo also provides a specification for applications to communicate with each other across a pair of hosts (which may be either an embedded device or a regular computer) or distributed across multiple hosts.
+Phyllo provides a specification for high-throughput + reliable + asynchronous message exchange between exactly two (2) peers. Phyllo also provides a specification for applications to communicate with each other across a pair of hosts (which may be either an embedded device or a regular computer) or distributed across multiple hosts.
 
 This repository manages specification of the phyllo protocol suite and application framework.
 
@@ -51,6 +51,7 @@ Phyllo provides frameworks to write client/server application programs with requ
 ## Scope and Limitations
 
 Currently, phyllo does:
+
 - Specify a way (ChunkedStreamLink) to transport up to 255-byte chunks of non-null bytes over a stream.
 - Specify a way (FrameLink) to transport up to 254-byte frames of arbitrary bytes over a stream.
 - Specify a way (DatagramLink) to transport up to 252-byte arbitrary datagram payloads over a FrameLink.
@@ -60,6 +61,7 @@ Currently, phyllo does:
 - Specify a structured command interface (CommandLink) for issuing and service arbitrary requests and responses between an application client and server over a DocumentLink.
 
 Currently, phyllo does not yet:
+
 - Specify most of the application layer links or framework functionality (NameRouter, ResourceLink, and/or ServiceLink).
 - Specify ReliableBufferLink handshaking for reliable setup of reliable data transmission.
 - Specify a connection hand-shaking method to negotiate the version and capabilities of the protocol (in ValidatedDatagramLink or above) or the application.
@@ -68,10 +70,12 @@ Currently, phyllo does not yet:
 - Specify a way to negotiate the serialization scheme for ObjectLink, to allow for JSON serialization instead of MessagePack serialization, and to allow fast and lightweight transmission of structured data following a schema.
 
 Phyllo does not yet (and will not, unless you'd like to make a feature request and start a discussion):
+
 - Support efficient out-of-order delivery of reliable buffers (such as with [Selective Repeat ARQ](https://en.wikipedia.org/wiki/Selective_Repeat_ARQ)).
 - Provide a way to send buffers longer than 246 bytes over a ReliableBufferLink (i.e. with segmentation).
 
 Phyllo does not (and will not, unless you'd like to develop a specification and/or extension):
+
 - Specify a way to extend the functionality available in the data transport layers.
 - Specify a way (such as with selective acknowledgements) to reduce the amount of data sent in reliable buffer layer retransmissions needed for reliable transmission.
 - Specify a means of direct communication between more than two peers on a bus or network. The roadmap includes a plan to specify a DistributedServiceLink which acts as a middle-man to delegate servicing of client requests to another connected device. If you want direct communication between more than two peers at a lower level, consider using PJON (see the Related Projects section), either standalone or combined with phyllo.
@@ -86,6 +90,7 @@ Phyllo does not (and will not, unless you'd like to develop a specification and/
 ### Transport
 
 The following libraries specify network protocols to enable reliable data exchange on embedded devices:
+
 - [PJON](https://www.pjon.org) ([Github](https://github.com/gioblu/PJON)) is a protocol designed for network communication between two or more hosts, potentially on a network, over *any of a variety of physical media and transports*. PJON specifies a dynamic header for different functionalities; this dynamic extensibility is important for interoperability on multi-host networks but adds overhead unnecessary for a point-to-point communication protocol between two hosts. PJON's [acknowledgement specification](https://github.com/gioblu/PJON/blob/master/specification/PJON-protocol-acknowledge-specification-v1.0.md) specifies [stop-and-wait ARQ](https://en.wikipedia.org/wiki/Stop-and-wait_ARQ) for reliable data transmission on physical media with multiple hosts, but it does not provide [general sliding window ARQ](https://en.wikipedia.org/wiki/Sliding_window_protocol) which can attain much higher performance on a point-to-point link between two hosts. These aspects of the protocol design make it more suitable for communication over networks but less suitable for high-data-rate performance on a point-to-point link.
 - [RadioHead](https://www.airspayce.com/mikem/arduino/RadioHead/) species a network protocol to provide to enable communication between two or more devices, potentially on a network, over *any of a variety of data radios* and other transports such as serial.
 - There are too many libraries to list which enable reliable data exchange via TCP/IP, with all the added complexities and hardware capabilities required for these protocols.
@@ -95,6 +100,7 @@ There are too many libraries to list which enable data exchange on embedded devi
 ### Application
 
 The following libraries also specify application frameworks based on message exchange on embedded devices:
+
 - [ModuleInterface](https://github.com/fredilarsen/ModuleInterface) provides a framework to synchronize variable values over a PJON connection.
 - [Telemetry](https://github.com/Overdrivr/Telemetry/wiki) provides a pub-sub messaging framework over serial or Bluetooth to send simple messages from computers or embedded devices or to send updated values to variables on embedded devices. However, the project is currently inactive, and there does not appear to be an easy way to guarantee reliable transmission over the communication link.
 - [Arduino-SerialCommand](https://github.com/kroimon/Arduino-SerialCommand) and its forks are very simple libraries which allow registering callback functions to string commands.
