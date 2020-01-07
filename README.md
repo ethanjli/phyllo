@@ -20,7 +20,7 @@ Phyllo's transport layers are designed exclusively for communication between exa
 #### Correspondence to OSI Model
 If the phyllo transport layers are stacked directly on top of a physical layer such as a serial data link (e.g. on a USB cable), then the peers are directly connected to each other with nothing in between, and the layers would be in [layer 2](https://en.wikipedia.org/wiki/Data_link_layer) (data link layer) of the [OSI model](https://en.wikipedia.org/wiki/OSI_model). If phyllo's transport layers are stacked on top of some other external transport-layer protocol (such as TCP or UDP), then the peers may be connected through a network, in which case they would all be at layer 5 (presentation layer) of the OSI model. If phyllo's "transport layers" are stacked on top of some other external network-layer protocol (such as [PJON](https://www.pjon.org/)), in which case they would all be at layer 4 (transport layer) of the OSI model.
 
-#### Encapsulation
+#### Framing
 Phyllo provides a way to transport discrete byte sequences in __frames__ over a byte stream, such as what might be exposed by a serial link or a TCP connection. Specifically, the byte sequence is encoded using [Consistent Overhead Byte Stuffing](https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing) ([Cheshire S, & Baker M, IEEE/ACM Trans. Netw. 1999](http://www.stuartcheshire.org/papers/COBSforToN.pdf)). In the OSI model, a frame link placed on top of a serial link (layer 1) would be in layer 2 (data link layer, media access control sublayer). Each frame is always assumed to contain exactly one datagram (see next).
 
 #### Protocol Multiplexing
