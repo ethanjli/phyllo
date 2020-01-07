@@ -2,7 +2,7 @@
 
 Data transport protocol functionality is decomposed into abstraction layers. Each layer exchanges data payloads [encapsulated](https://book.systemsapproach.org/foundation/architecture.html#encapsulation) as blobs of bytes together with some other associated data exchanged between peers. Above the frame layer, transport layers also exchange a [demultiplexing key](https://book.systemsapproach.org/foundation/architecture.html#multiplexing-and-demultiplexing) together with each data payload to specify how the payload should be handled.
 
-Conventional stack configurations are as follows:
+Conventional stack configurations (with the top of the stack higher in the table and the bottom of the stack at the bottom of the table) are as follows:
 
 | Transport Layer                                | Full | Standard | Minimal |
 | ---------------------------------------------- | ---- | -------- | ------- |
