@@ -4,15 +4,15 @@ Data transport protocol functionality is decomposed into abstraction layers. Eac
 
 Conventional stack configurations are as follows:
 
-| Transport Layer         | Full | Standard | Minimal |
-| ----------------------- | ---- | -------- | ------- |
-| Ported Buffer Link      | Yes  | No       | No      |
-| Reliable Buffer Link    | Yes  | Yes      | No      |
-| Validated Datagram Link | Yes  | Yes      | No      |
-| Datagram Link           | Yes  | Yes      | Yes     |
-| Frame Link              | Yes  | Yes      | Yes     |
-| Chunked Stream Link     | Yes  | Yes      | Yes     |
-| Stream Link             | Yes  | Yes      | Yes     |
+| Transport Layer                                | Full | Standard | Minimal |
+| ---------------------------------------------- | ---- | -------- | ------- |
+| [Ported Buffer Link](#ported-buffer)           | Yes  | No       | No      |
+| [Reliable Buffer Link](#reliable-buffer)       | Yes  | Yes      | No      |
+| [Validated Datagram Link](#validated-datagram) | Yes  | Yes      | No      |
+| [Datagram Link](#datagram)                     | Yes  | Yes      | Yes     |
+| [Frame Link](#frame)                           | Yes  | Yes      | Yes     |
+| [Chunked Stream Link](#chunked-stream)         | Yes  | Yes      | Yes     |
+| [Stream Link](#stream)                         | Yes  | Yes      | Yes     |
 
 These conventional configurations are most suitable for different use cases:
 
