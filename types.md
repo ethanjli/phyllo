@@ -37,7 +37,7 @@ Each protocol has a one-byte numerical type code associated with it. When a type
 
 ## Transport
 
-`0x20` - `0x2f` are reserved for byte buffer payloads representing phyllo-specified transport-layer data units:
+`0x20` - `0x2f` are reserved for byte buffer payloads representing phyllo-specified transport-level data units:
 
 | Protocol Type                | Type Code | Description        |
 | ---------------------------- | --------- | ------------------ |
@@ -49,12 +49,12 @@ Each protocol has a one-byte numerical type code associated with it. When a type
 
 `0x25` - `0x2f` are reserved for future specification by phyllo.
 
-`0x30` - `0x3f` are allocated for byte buffer payloads representing transport-level data units specified by programmers.
+`0x30` - `0x3f` are allocated for byte buffer payloads representing transport-level data units specified by programmers on an ad hoc basis.
 
 
 ## Presentation
 
-`0x40` - `0x4f` are reserved for byte buffer payloads representing phyllo-specified presentation-layer serialized documents:
+`0x40` - `0x4f` are reserved for byte buffer payloads representing phyllo-specified presentation-level serialized documents:
 
 | Protocol Type          | Type Code | Description          |
 | ---------------------- | --------- | -------------------- |
@@ -64,8 +64,22 @@ Each protocol has a one-byte numerical type code associated with it. When a type
 
 `0x43` - `0x4f` are reserved for future specification by phyllo.
 
-`0x50` - `0x5f` are allocated for byte buffer payloads representing presentation-level serialized documents specified by programmers/applications.
+`0x50` - `0x5f` are allocated for byte buffer payloads representing presentation-level serialized documents specified by programmers/applications on an ad hoc basis.
+
 
 ## Application
 
-`0x60` - `0xff` are reserved for future specification/allocation by phyllo.
+`0x60` - `0x61` are reserved for documents representing phyllo-specified application-level messages:
+
+| Protocol Type         | Type Code | Description                           |
+| --------------------- | --------- | ------------------------------------- |
+| `application/generic` | `0x60`    | Generic (unspecified) application     |
+| `application/pubsub`  | `0x61`    | Generic pub-sub messaging application |
+| `application/rpc`     | `0x62`    | Generic RPC application               |
+| `application/rest`    | `0x63`    | Generic RESTful application           |
+
+`0x64` - `0x6f` are reserved for future specification by phyllo.
+
+`0x70` - `0x7f` are allocated for documents representing application-level documents specified by programmers/applications on an ad hoc basis.
+
+`0x80` - `0xff` are reserved for future specification/allocation by phyllo.
