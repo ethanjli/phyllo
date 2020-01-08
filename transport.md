@@ -4,15 +4,15 @@ Data transport protocol functionality is decomposed into abstraction layers. Eac
 
 Conventional stack configurations (with the top of the stack higher in the table and the bottom of the stack at the bottom of the table) are as follows:
 
-| Transport Layer                                | Full | Standard | Minimal |
-| ---------------------------------------------- | ---- | -------- | ------- |
-| [Ported Buffer Link](#ported-buffer)           | Yes  | No       | No      |
-| [Reliable Buffer Link](#reliable-buffer)       | Yes  | Yes      | No      |
-| [Validated Datagram Link](#validated-datagram) | Yes  | Yes      | No      |
-| [Datagram Link](#datagram)                     | Yes  | Yes      | Yes     |
-| [Frame Link](#frame)                           | Yes  | Yes      | Yes     |
-| [Chunked Stream Link](#chunked-stream)         | Yes  | Yes      | Yes     |
-| [Stream Link](#stream)                         | Yes  | Yes      | Yes     |
+| Transport Layer                                | Full | Standard | Reduced | Minimal |
+| ---------------------------------------------- | ---- | -------- | ------- | ------- |
+| [Ported Buffer Link](#ported-buffer)           | Yes  | No       | No      | No      |
+| [Reliable Buffer Link](#reliable-buffer)       | Yes  | Yes      | No      | No      |
+| [Validated Datagram Link](#validated-datagram) | Yes  | Yes      | Yes     | No      |
+| [Datagram Link](#datagram)                     | Yes  | Yes      | Yes     | Yes     |
+| [Frame Link](#frame)                           | Yes  | Yes      | Yes     | Yes     |
+| [Chunked Stream Link](#chunked-stream)         | Yes  | Yes      | Yes     | Yes     |
+| [Stream Link](#stream)                         | Yes  | Yes      | Yes     | Yes     |
 
 These conventional configurations are most suitable for different use cases:
 
@@ -99,12 +99,12 @@ When a peer receives a delimiter, it will begin receiving subsequent bytes as pa
 The use of a single-byte chunk delimiter makes it simple to detect chunk boundaries. The transmission of a delimiter before the payload is not strictly necessary for a point-to-point stream link such as a serial connection, but it improves receiving robustness in case there is contention on a layer underneath, whether due to contention by multiple hosts or due to contention by multiple sending threads on a single host.
 
 #### Example
-A sequence of byte buffer payloads (`0x01`, `0x02 0x03`, `0x04 0x05 0x06`) will be transmitted as the following byte stream:
+A sequence of two byte buffer payloads (`0x01`, `0x02 0x03`) will be transmitted as the following byte stream:
 
-| __Name__     | Delimiter | Payload | Delimiter | Delimiter | Payload     | Delimiter | Delimiter | Payload          |
-| ------------ | --------- | ------- | --------- | --------- | ----------- | --------- | --------- | ---------------- |
-| __Length__   | 1         | 1       | 1         | 1         | 2           | 1         | 1         | 3                |
-| __Contents__ | `0x00`    | `0x01`  | `0x00`    | `0x00`    | `0x02 0x03` | `0x00`    | `0x00`    | `0x04 0x05 0x06` |
+| __Name__     | Delimiter | Payload | Delimiter | Delimiter | Payload     | Delimiter |
+| ------------ | --------- | ------- | --------- | --------- | ----------- | --------- |
+| __Length__   | 1         | 1       | 1         | 1         | 2           | 1         |
+| __Contents__ | `0x00`    | `0x01`  | `0x00`    | `0x00`    | `0x02 0x03` | `0x00`    |
 
 The receiver of this byte stream will receive the same sequence of byte buffer payloads (`0x01`, `0x02 0x03`, `0x04 0x05 0x06`).
 
