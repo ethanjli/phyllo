@@ -56,11 +56,12 @@ Each protocol has a one-byte numerical type code associated with it. When a type
 
 `0x40` - `0x4f` are reserved for byte buffer payloads representing phyllo-specified presentation-level serialized documents:
 
-| Protocol Type          | Type Code | Description          |
-| ---------------------- | --------- | -------------------- |
-| `presentation/msgpack` | `0x40`    | MessagePack document |
-| `presentation/cbor`    | `0x41`    | CBOR data item       |
-| `presentation/json`    | `0x42`    | JSON document        |
+| Protocol Type           | Type Code | Description                      |
+| ----------------------- | --------- | ----------------------------  -- |
+| `presentation/document` | `0x40`    | Serialized document              |
+| `presentation/msgpack`  | `0x41`    | MessagePack serialization format |
+| `presentation/cbor`     | `0x42`    | CBOR serialization format        |
+| `presentation/json`     | `0x43`    | JSON serialization format        |
 
 `0x43` - `0x4f` are reserved for future specification by phyllo.
 
