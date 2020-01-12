@@ -48,6 +48,14 @@ Phyllo provides a way to pass __messages__ between peers in independent channels
 Phyllo provides frameworks to write client/server application programs with request/reply message transactions over a message link. The [remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call) (RPC) framework uses the message link's namespace to name procedures, and adds a channel ID and sequence number for sequential and reliable execution of multiple transactions concurrently. The resource ([RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer)) framework uses the message link's namespace as a uniform resource locator to uniquely name resources, and adds a verb code to name different types of requests and responses.
 
 
+## Implementations
+
+Currently, the following implementations exist:
+
+- A C++ library providing a standard protocol implementation and application framework for embedded devices, along with an I/O layer for serial communication in the Arduino framework. This implementation heavily uses the [Embedded Template Library](https://www.etlcpp.com/).
+- A Python library providing a standard protocol implementation and application framework for computers, along with an I/O layer for various communication I/O implementations. The protocol implementation has a [Sans I/O](https://sans-io.readthedocs.io/)-based design.
+
+
 ## Scope and Limitations
 
 Currently, phyllo does:

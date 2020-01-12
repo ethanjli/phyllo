@@ -100,12 +100,12 @@ Each document serialization format has an associated serialization format code. 
 #### Statically Typed
 `0x20` - `0x2f` are reserved for phyllo-specified binary statically typed formats:
 
-| Protocol Type               | Format Code | Name            |
-| --------------------------- | ----------- | --------------- |
-| `binary/static/protobuf`    | `0x20`      | Protocol Buffer |
-| `binary/static/thrift`      | `0x21`      | Thrift          |
-| `binary/static/capnproto`   | `0x22`      | Cap'n Proto     |
-| `binary/static/flatbuffers` | `0x23`      | FlatBuffers     |
+| Protocol Type               | Format Code | Name             |
+| --------------------------- | ----------- | ---------------- |
+| `binary/static/protobuf`    | `0x20`      | Protocol Buffers |
+| `binary/static/thrift`      | `0x21`      | Thrift           |
+| `binary/static/flatbuffers` | `0x22`      | FlatBuffers      |
+| `binary/static/capnproto`   | `0x23`      | Cap'n Proto      |
 
 `0x24` - `0x2f` are reserved for future specification by phyllo.
 
@@ -164,20 +164,22 @@ Generic schemas are common reusable types corresponding to singleton data.
 
 | Schema Type                 | Schema Code | Description         |
 | --------------------------- | ----------- | ------------------- |
-| `generic/primitive/boolean` | `0x11`      | boolean             |
-| `generic/primitive/none`    | `0x12`      | Nil/null/none       |
-| `generic/primitive/uint8`   | `0x13`      | uint8 number        |
-| `generic/primitive/uint16`  | `0x14`      | uint16 number       |
-| `generic/primitive/uint32`  | `0x15`      | uint32 number       |
-| `generic/primitive/uint64`  | `0x16`      | uint64 number       |
-| `generic/primitive/int8`    | `0x17`      | int8 number         |
-| `generic/primitive/int16`   | `0x18`      | int16 number        |
-| `generic/primitive/int32`   | `0x19`      | int32 number        |
-| `generic/primitive/int64`   | `0x1a`      | int64 number        |
-| `generic/primitive/float32` | `0x1b`      | 32-bit float number |
-| `generic/primitive/float64` | `0x1c`      | 64-bit float number |
+| `generic/primitive/none`    | `0x11`      | Nil/null/none       |
+| `generic/primitive/boolean` | `0x12`      | boolean             |
+| `generic/primitive/uint`    | `0x13`      | uint8 number        |
+| `generic/primitive/uint8`   | `0x14`      | uint8 number        |
+| `generic/primitive/uint16`  | `0x15`      | uint16 number       |
+| `generic/primitive/uint32`  | `0x16`      | uint32 number       |
+| `generic/primitive/uint64`  | `0x17`      | uint64 number       |
+| `generic/primitive/int`     | `0x18`      | uint8 number        |
+| `generic/primitive/int8`    | `0x19`      | int8 number         |
+| `generic/primitive/int16`   | `0x1a`      | int16 number        |
+| `generic/primitive/int32`   | `0x1b`      | int32 number        |
+| `generic/primitive/int64`   | `0x1c`      | int64 number        |
+| `generic/primitive/float32` | `0x1d`      | 32-bit float number |
+| `generic/primitive/float64` | `0x1e`      | 64-bit float number |
 
-`0x1d` - `0x1f` are reserved for future specification by phyllo.
+`0x1f` is reserved for future specification by phyllo.
 
 #### Sequence
 `0x20` - `0x2f` are reserved for phyllo-specified generic types of sequence data:

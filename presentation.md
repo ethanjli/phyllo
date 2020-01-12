@@ -2,8 +2,6 @@
 
 Data presentation protocol functionality is decomposed into various serialization strategies in a single document layer. The document layer exchanges structured data payloads serialized as blobs of bytes, together with a serialization format identifier and a schema identifier to specify how the body should be deserialized and parsed by the application running over the document layer.
 
-The conventional Document Link serialization format for communication with embedded systems is [MessagePack](https://msgpack.org/) (v5/2.0 specification, which distinguishes between strings and binary data), while the conventional serialization format for communication between computers is JSON.
-
 
 ## Document
 
@@ -76,3 +74,19 @@ A tuple payload of `(true, "abcd")` which is specified by some programmer-define
 | __Contents__ | `0x70` | `0x92` | `0xc3` | `0xa4` | `0x61` | `0x62` | `0x63` | `0x64` |
 
 The receiver of this document body will receive the same tuple `(true, "abcd")`.
+
+
+## Serialization Formats
+
+Every document has a body serialized in a particular format. The conventional Document Link serialization format for communication with embedded systems is [MessagePack](https://msgpack.org/), while the conventional serialization format for communication between computers is JSON.
+
+### MessagePack
+
+The particular version of MessagePack used as the standard format for Phyllo communication with embedded systems is the v5/2.0 specification, which distinguishes between strings and binary data. Furthermore, all implementations and applications are expected to obey the following conventions for interoperability:
+
+- Binary data needs to be supported.
+- All strings should be UTF-8 encoded.
+- Extension types are not allowed.
+- Map keys must be unique: no duplicate keys are allowed.
+- All keys of any given map should have the same type. Strings can always be used as map keys. In implementations which allow integers (signed or unsigned) as map keys, all keys of any given map should be either pure strings, pure signed integers, or pure unsigned integers. No other types can be used as map keys.
+- The order of key-value pairs in maps should not be expected to be stable or preserved.
