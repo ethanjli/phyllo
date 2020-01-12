@@ -37,7 +37,7 @@ Error reporting:
 
 ### Peer Interface
 
-Each byte buffer exchanged due to the service interface is exchanged as a body serialized in the specified serialization format, together with a schema code specifying the schema for parsing the payload:
+Each byte buffer exchanged due to the service interface is exchanged as a body serialized in the document link's serialization format, together with a schema code specifying the schema for parsing the payload:
 
 | __Name__     | Schema              | Body                          |
 | ------------ | ------------------- | ----------------------------- |
@@ -78,7 +78,7 @@ The receiver of this document body will receive the same tuple `(true, "abcd")`.
 
 ## Serialization Formats
 
-Every document has a body serialized in a particular format. The conventional Document Link serialization format for communication with embedded systems is [MessagePack](https://msgpack.org/), while the conventional serialization format for communication between computers is JSON.
+Every document has a body serialized in a particular format. The conventional Document Link serialization format for binary communication (such as with embedded systems) is [MessagePack](https://msgpack.org/), while the conventional serialization format for text-based communication between computers (such as over HTTP) is JSON.
 
 ### MessagePack
 
@@ -90,3 +90,7 @@ The particular version of MessagePack used as the standard format for Phyllo com
 - Map keys must be unique: no duplicate keys are allowed.
 - All keys of any given map should have the same type. Strings can always be used as map keys. In implementations which allow integers (signed or unsigned) as map keys, all keys of any given map should be either pure strings, pure signed integers, or pure unsigned integers. No other types can be used as map keys.
 - The order of key-value pairs in maps should not be expected to be stable or preserved.
+
+MessagePack is used as the conventional binary serialization format for applications, rather than a more compact (and perhaps faster) compiled format such as Protocol Buffers or FlatBuffers, so that application programmers do not have to compile schema files into code files.
+
+In the future, application frameworks may use Protocol Buffers for serializing messages within the application framework layer(s), but every framework should expose a MessagePack document link at the top for serializing any application data payloads carried by the framework.
