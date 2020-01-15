@@ -2,22 +2,33 @@
 
 Data transport protocol functionality is decomposed into abstraction layers. Each layer exchanges data payloads [encapsulated](https://book.systemsapproach.org/foundation/architecture.html#encapsulation) as blobs of bytes together with some other associated data exchanged between peers. Above the frame layer, transport layers also exchange a [demultiplexing key](https://book.systemsapproach.org/foundation/architecture.html#multiplexing-and-demultiplexing) together with each data payload to specify how the payload should be handled.
 
+## Conventional Configurations
+
+Conventional transport stacks consist of two sub-stacks:
+
+- The __Medium__ sub-stack provides exchange of byte buffers over an I/O interface.
+- The __Logical__ sub-stack, which is layered on top of the medium sub-stack, provides all other transport-level services.
+
 Conventional stack configurations (with the top of the stack higher in the table and the bottom of the stack at the bottom of the table) are as follows:
 
-| Transport Layer                                | Full | Standard | Reduced | Minimal |
+| Logical Sub-Stack Layer                        | Full | Standard | Reduced | Minimal |
 | ---------------------------------------------- | ---- | -------- | ------- | ------- |
 | [Ported Buffer Link](#ported-buffer)           | Yes  | No       | No      | No      |
 | [Reliable Buffer Link](#reliable-buffer)       | Yes  | Yes      | No      | No      |
 | [Validated Datagram Link](#validated-datagram) | Yes  | Yes      | Yes     | No      |
 | [Datagram Link](#datagram)                     | Yes  | Yes      | Yes     | Yes     |
-| [Frame Link](#frame)                           | Yes  | Yes      | Yes     | Yes     |
-| [Chunked Stream Link](#chunked-stream)         | Yes  | Yes      | Yes     | Yes     |
-| [Stream Link](#stream)                         | Yes  | Yes      | Yes     | Yes     |
+
+| Medium Sub-Stack Layer                         | Stream |
+| ---------------------------------------------- | ------ |
+| [Frame Link](#frame)                           | Yes    |
+| [Chunked Stream Link](#chunked-stream)         | Yes    |
+| [Stream Link](#stream)                         | Yes    |
 
 These conventional configurations are most suitable for different use cases:
 
 - Full: when either peer has multiple independent applications which need to share a data link.
-- Standard: when reliable transmission guarantees are needed.
+- Standard: when reliable transmission guarantees are needed (always guarantees exactly-once delivery).
+- Reduced: when error detection is needed but reliable transmission guarantees are not needed (guarantees at-most-once delivery on a point-to-point link).
 - Minimal: when the data link underlying the stream link already provides reliable transmission guarantees, and extremely high data throughput is required; or when the peer has extremely low memory.
 
 

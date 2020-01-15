@@ -5,12 +5,12 @@ Data presentation protocol functionality is decomposed into various serializatio
 
 ## Document
 
-The __document link__ enables exchange of structured data with arbitrary contents over a link providing byte buffer exchange, by serializing payloads with an application protocol-specified schema. Each document link is initialized to support exactly one serialization format - applications which need to communicate over multiple serialization formats should use multiple document links multiplexed with a Ported Buffer Link.
+The __document link__ enables exchange of structured data with arbitrary contents over a link providing byte buffer exchange, by serializing payloads with an application protocol-specified schema; any unit of structured data is called a __document__. Each document link is initialized to support exactly one serialization format - applications which need to communicate over multiple serialization formats should use multiple document links multiplexed with a Ported Buffer Link.
 
 ### Basic Description
 
 - Data unit name: Document
-- Payload type: application data (serialized body or document tree)
+- Payload type: application data (serialized body or specific data or generic document tree)
 - Layer name: Document Link
 - Protocol type: `presentation/document`
 - Protocol type code: `0x40`
@@ -25,8 +25,8 @@ The __document link__ enables exchange of structured data with arbitrary content
 
 Structured data interface:
 
-- __send__ a serialized body of structured data with a specified schema to the other peer.
-- __send__ a unit of structured data with a specified schema (or, for implementations which support it, a specified schema type).
+- __send__ a byte buffer representing serialized structured data with a specified schema to the other peer.
+- __send__ a unit of structured data with a specified schema (or, for implementations which support it, a specified schema type) to the other peer.
 - __send__ a document tree containing structured data with a specified schema (or, for implementations which support it, a specified schema type) to the other peer, for serialization format implementations which support it.
 - __has receive__ to check whether a unit of structured data has been received from the other peer and is ready to be consumed.
 - __receive__ to consume the received unit of structured data from the other peer. In some implementations, the serialized data may be immediately deserialized into a document tree or a structured representation, while in other implementations deserialization may be deferred until required by the application through an interface provided with the data.
@@ -66,7 +66,7 @@ A string payload of `"abcd"` will be sent as the following messagepack-serialize
 
 The receiver of this document body will receive the same string `"abcd"`.
 
-A tuple payload of `(true, "abcd")` which is specified by some programmer-defined schema `0x70` will be sent as the following messagepack-serialized document:
+A tuple payload of `(true, "abcd")` which is specified by some programmer-defined schema `0x70` will be sent as the following MessagePack-serialized document:
 
 | __Type__     | Schema | Byte   | Byte   | Byte   | Byte   | Byte   | Byte   | Byte   |
 | ------------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
@@ -91,6 +91,4 @@ The particular version of MessagePack used as the standard format for Phyllo com
 - All keys of any given map should have the same type. Strings can always be used as map keys. In implementations which allow integers (signed or unsigned) as map keys, all keys of any given map should be either pure strings, pure signed integers, or pure unsigned integers. No other types can be used as map keys.
 - The order of key-value pairs in maps should not be expected to be stable or preserved.
 
-MessagePack is used as the conventional binary serialization format for applications, rather than a more compact (and perhaps faster) compiled format such as Protocol Buffers or FlatBuffers, so that application programmers do not have to compile schema files into code files.
-
-In the future, application frameworks may use Protocol Buffers for serializing messages within the application framework layer(s), but every framework should expose a MessagePack document link at the top for serializing any application data payloads carried by the framework.
+MessagePack is used as the conventional binary serialization format for application frameworks and applications, rather than a more compact (and perhaps faster) compiled format such as Protocol Buffers or FlatBuffers, so that application programmers do not have to compile schema files into code files.

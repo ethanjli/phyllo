@@ -44,13 +44,13 @@ Each protocol has a one-byte numerical type code associated with it. When a type
 
 `0x20` - `0x2f` are reserved for byte buffer payloads representing phyllo-specified transport-level data units:
 
-| Protocol Type                 | Type Code | Description        |
-| ----------------------------- | --------- | ------------------ |
-| `transport/frame`             | `0x20`    | COBS-encoded Frame |
-| `transport/datagram`          | `0x21`    | Datagram           |
-| `transport/validatedDatagram` | `0x22`    | Validated Datagram |
-| `transport/reliableBuffer`    | `0x23`    | Reliable Buffer    |
-| `transport/portedBuffer`      | `0x24`    | Ported Buffer      |
+| Protocol Type                 | Type Code | Description        | ASCII Type Code Equivalent |
+| ----------------------------- | --------- | ------------------ | -------------------------- |
+| `transport/frame`             | `0x20`    | COBS-encoded Frame | (space)                    |
+| `transport/datagram`          | `0x21`    | Datagram           | `!`                        |
+| `transport/validatedDatagram` | `0x22`    | Validated Datagram | `"`                        |
+| `transport/reliableBuffer`    | `0x23`    | Reliable Buffer    | `#`                        |
+| `transport/portedBuffer`      | `0x24`    | Ported Buffer      | `$`                        |
 
 `0x25` - `0x2f` are reserved for future specification by phyllo.
 
@@ -61,9 +61,9 @@ Each protocol has a one-byte numerical type code associated with it. When a type
 
 `0x40` - `0x4f` are reserved for byte buffer payloads representing phyllo-specified presentation-level serialized documents:
 
-| Protocol Type           | Type Code | Description                                      |
-| ----------------------- | --------- | ------------------------------------------------ |
-| `presentation/document` | `0x40`    | Generic (format unspecified) serialized document |
+| Protocol Type           | Type Code | Description                                      | ASCII Type Code Equivalent |
+| ----------------------- | --------- | -------------------------------------------------| -------------------------- |
+| `presentation/document` | `0x40`    | Generic (format unspecified) serialized document | `@`                        |
 
 `0x41` - `0x4f` are reserved for future specification by phyllo.
 
@@ -100,12 +100,12 @@ Each document serialization format has an associated serialization format code. 
 #### Statically Typed
 `0x20` - `0x2f` are reserved for phyllo-specified binary statically typed formats:
 
-| Protocol Type               | Format Code | Name             |
-| --------------------------- | ----------- | ---------------- |
-| `binary/static/protobuf`    | `0x20`      | Protocol Buffers |
-| `binary/static/thrift`      | `0x21`      | Thrift           |
-| `binary/static/flatbuffers` | `0x22`      | FlatBuffers      |
-| `binary/static/capnproto`   | `0x23`      | Cap'n Proto      |
+| Protocol Type               | Format Code | Name             | ASCII Type Code Equivalent |
+| --------------------------- | ----------- | ---------------- | -------------------------- |
+| `binary/static/protobuf`    | `0x20`      | Protocol Buffers | (space)                    |
+| `binary/static/thrift`      | `0x21`      | Thrift           | `!`                        |
+| `binary/static/flatbuffers` | `0x22`      | FlatBuffers      | `"`                        |
+| `binary/static/capnproto`   | `0x23`      | Cap'n Proto      | `#`                        |
 
 `0x24` - `0x2f` are reserved for future specification by phyllo.
 
@@ -115,10 +115,10 @@ Each document serialization format has an associated serialization format code. 
 
 `0x40` - `0x4f` are reserved for phyllo-specified text-based formats:
 
-| Protocol Type | Format Code | Name |
-| ------------- | ----------- | ---- |
-| `text/json`   | `0x40`      | JSON |
-| `text/csv`    | `0x41`      | CSV  |
+| Protocol Type | Format Code | Name | ASCII Type Code Equivalent |
+| ------------- | ----------- | ---- | -------------------------- |
+| `text/json`   | `0x40`      | JSON | `@`                        |
+| `text/csv`    | `0x41`      | CSV  | `A`                        |
 
 `0x42` - `0x4f` are reserved for future specification by phyllo.
 
@@ -209,28 +209,28 @@ Generic schemas are common reusable types corresponding to singleton data.
 #### Pub-Sub Messaging
 `0x40` - `0x4f` are reserved for phyllo-specified schemas of pub-sub application framework messages:
 
-| Schema Type                | Schema Code | Description             |
-| -------------------------- | ----------- | ----------------------- |
-| `framework/pubsub/generic` | `0x40`      | Generic pub-sub message |
-| `framework/pubsub/phyllo`  | `0x41`      | Phyllo pub-sub message  |
+| Schema Type                | Schema Code | Description             | ASCII Type Code Equivalent |
+| -------------------------- | ----------- | ----------------------- | -------------------------- |
+| `framework/pubsub/generic` | `0x40`      | Generic pub-sub message | `@`                        |
+| `framework/pubsub/phyllo`  | `0x41`      | Phyllo pub-sub message  | `A`                        |
 
 `0x42` - `0x4f` are reserved for future specification by phyllo.
 
 #### RPC
-| Schema Type             | Schema Code | Description             |
-| ----------------------- | ----------- | ----------------------- |
-| `framework/rpc/generic` | `0x50`      | Generic RPC message     |
-| `framework/rpc/phyllo`  | `0x51`      | Phyllo RPC message      |
-| `framework/rpc/msgpack` | `0x52`      | MessagePack-RPC message |
+| Schema Type             | Schema Code | Description             | ASCII Type Code Equivalent |
+| ----------------------- | ----------- | ----------------------- | -------------------------- |
+| `framework/rpc/generic` | `0x50`      | Generic RPC message     | `P`                        |
+| `framework/rpc/phyllo`  | `0x51`      | Phyllo RPC message      | `Q`                        |
+| `framework/rpc/msgpack` | `0x52`      | MessagePack-RPC message | `R`                        |
 
 `0x53` - `0x57` are reserved for future specification by phyllo.
 
 #### REST
-| Schema Type              | Schema Code | Description             |
-| ------------------------ | ----------- | ----------------------- |
-| `framework/rest/generic` | `0x58`      | Generic RESTful message |
-| `framework/rest/phyllo`  | `0x59`      | Phyllo RESTful message  |
-| `framework/rest/coap`    | `0x5a`      | CoAP RESTful message    |
+| Schema Type              | Schema Code | Description             | ASCII Type Code Equivalent |
+| ------------------------ | ----------- | ----------------------- | -------------------------- |
+| `framework/rest/generic` | `0x58`      | Generic RESTful message | `X`                        |
+| `framework/rest/phyllo`  | `0x59`      | Phyllo RESTful message  | `Y`                        |
+| `framework/rest/coap`    | `0x5a`      | CoAP RESTful message    | `Z`                        |
 
 `0x5b` - `0x5f` are reserved for future specification by phyllo.
 
