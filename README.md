@@ -37,9 +37,9 @@ Phyllo provides an optional way to multiplex communication between different pee
 
 ### Presentation
 
-Phyllo provides ways to use various presentation layer protocols for serialization and deserialization of application data as __documents__ over any phyllo transport layer. Canonically, [MessagePack](https://msgpack.org/index.html) is used for efficient encoding and transmission of small schema-less documents. Alternative serialization schemes can also be used.
+Phyllo provides ways to use various presentation layer protocols for serialization and deserialization of application data as __documents__. Canonically, [MessagePack](https://msgpack.org/index.html) is used for efficient encoding and transmission of small schema-less documents. The protocol specification also provides a way to specify alternative serialization schemes.
 
-### Application
+### Application Frameworks
 
 #### Publish/Subscribe Messaging
 Phyllo provides a way to pass __messages__ between peers in independent channels multiplexed in a hierarchical namespace over a document link, acting as a pub-sub message bus between workers at the ends of the message link.
@@ -65,17 +65,16 @@ Currently, phyllo does:
 - Specify a way (DatagramLink) to transport up to 252-byte arbitrary datagram payloads over a FrameLink.
 - Specify a way (ValidatedDatagramLink) to transport up to 247-byte arbitrary validated datagram payloads over a DatagramLink with an exceptionally fast 32-bit CRC using polynomial 0x000001ED ([Ray32sub8](https://users.ece.cmu.edu/~koopman/pubs/ray06_crcalgorithms.pdf), with computational cost similar to a normal CRC16 computation) guaranteeing that any data transmission errors of up to 5 bits per datagram (i.e. HD=6) will be caught, and that any data transmission errors of up to 7 bits per datagram (i.e. HD=8) will be caught for datagram payloads of up to 99 bytes.
 - Partially specify a way (ReliableBufferLink) to reliably transmit up to 243-byte arbitrary byte buffer payloads over a ValidatedDatagramLink.
-- Specify a way (DocumentLink) to efficiently encode and transmit small unstructured documents, with [MessagePack](https://msgpack.org/index.html). A document is equivalent to a JSON number/string/array/object or a Python number/string/list/tuple/dict.
-- Specify a structured command interface (CommandLink) for issuing and service arbitrary requests and responses between an application client and server over a DocumentLink.
+- Specify a way (DocumentLink) to efficiently encode and transmit small unstructured documents, using [MessagePack](https://msgpack.org/index.html). A document is equivalent to a JSON number/string/array/object or a Python number/string/list/tuple/dict.
+- Specify a way (MessageLink) for publish-subscribe messaging to exchange documents over independent logical channels by channel name.
 
 Currently, phyllo does not yet:
 
-- Specify most of the application layer links or framework functionality (NameRouter, ResourceLink, and/or ServiceLink).
+- Specify most of the application layer links or framework functionality (MessageRouter, ResourceLink, and/or RPCLink).
 - Specify ReliableBufferLink handshaking for reliable setup of reliable data transmission.
 - Specify a connection hand-shaking method to negotiate the version and capabilities of the protocol (in ValidatedDatagramLink or above) or the application.
-- Provide documentation of protocol specification APIs.
 - Specify a way to make unreliable buffer transmission accessible to layers above ReliableBufferLink.
-- Specify a way to negotiate the serialization scheme for ObjectLink, to allow for JSON serialization instead of MessagePack serialization, and to allow fast and lightweight transmission of structured data following a schema.
+- Specify a way to negotiate the serialization format for any DocumentLink.
 
 Phyllo does not yet (and will not, unless you'd like to make a feature request and start a discussion):
 

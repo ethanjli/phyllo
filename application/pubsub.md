@@ -1,6 +1,12 @@
-# Pub-Sub Messaging
+# Publish-Subscribe Messaging
 
 The phyllo __pub-sub messaging framework__ enables exchange of documents as payloads over independent named logical channels (called _topics_) multiplexed over a link providing structured data exchange, such as a document link, by the [publish-subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern). Each document combining topic and payload document is called a __message__. Various components of an application can exchange documents over application-specified topics with an application running on the other peer, even without specific knowledge about the other application. This allows applications to specify an interface for independent channels of communication by document exchange.
+
+
+## Basic Description
+
+- Framework name: Pub-Sub
+- Purpose: Publish-subscribe pattern of document exchange.
 
 
 ## Message Link
@@ -12,18 +18,17 @@ The __message link__ handles representation of messages in documents.
 - Data unit name: Message
 - Data unit type: document
 - Payload type: application data (serialized body or specific data structure or generic document tree)
-- Framework name: Pub-Sub
 - Document serialization format name: 'binary/dynamic/msgpack'
 - Document serialization format code: `0x00`
 - Document schema type: `framework/pubsub/phyllo`
 - Document schema code: `0x41`
-- Purpose: Publish-subscribe pattern of document exchange.
+- Purpose: Representation of application data in named-topic channels.
 - Payload demultiplexing keys: topic
 - Services required from below:
     - Structured data exchange
 - Services provided for above:
     - Structured data exchange
-    - Payload topic-based multiplexing
+    - Payload name-based multiplexing
 
 Messages are serialized on embedded devices in the MessagePack format and on computers in the JSON format.
 
