@@ -21,6 +21,9 @@ The __RPC message link__ handles representation of RPC request-response transact
 - Protocol type: `application/rpc`
 - Protocol type code: `0x61`
 - Purpose: Representation of RPC transaction request/response data.
+- Payload demultiplexing keys: topic
+- Length overhead: at least 3 bytes, depending on the length of the transaction ID and the RPC message options
+- Payload maximum length: determined by payload length limits of layers underneath, length of transaction ID, RPC message options
 - Services required from below:
     - Byte buffer exchange
 - Services provided for above:
@@ -97,25 +100,25 @@ The method/status field is used to specify the RPC method to call in the request
 ##### Response Statuses
 `0x00` - `0x1f` are reserved for specification of response statuses by phyllo:
 
-| Status                  | Status Code| Description                                                               |
-| ----------------------- | ---------- | ------------------------------------------------------------------------- |
-| `status/ok`             | `0x00`     | No error, returned on success.                                            |
-| `status/cancelled`      | `0x01`     | Transaction was cancelled, typically by the client.                       |
-| `status/unknown`        | `0x02`     | Unknown error.                                                            |
-| `status/argument`       | `0x03`     | Client specified an invalid argument.                                     |
-| `status/deadline`       | `0x04`     | Deadline expired before the transaction could complete.                   |
-| `status/missing`        | `0x05`     | Some requested entity was not found.                                      |
-| `status/exists`         | `0x06`     | The entity that a client attempted to create already exists.              |
-| `status/permission`     | `0x07`     | Client does not have permission to execute the transaction.               |
-| `status/exhausted`      | `0x08`     | Some resource has been exhausted.                                         |
-| `status/precondition`   | `0x09`     | Transaction rejected because system is not in state needed for it.        |
-| `status/aborted`        | `0x0a`     | Transaction aborted, typically due to concurrency conflict.               |
-| `status/range`          | `0x0b`     | Transaction was attempteed outside the valid range.                       |
-| `status/unimplemented`  | `0x0c`     | Transaction is not implemented/supported/enabled by the server.           |
-| `status/internal`       | `0x0d`     | Some invariant expected by the underlying system has been broken.         |
-| `status/unavailable`    | `0x0e`     | Service is currently unavailable.                                         |
-| `status/data`           | `0x0f`     | Unrecoverable data loss or corruption.                                    |
-| `status/authentication` | `0x10`     | Client does not have valid authentication credentials for the transaction.|
+| Status                        | Status Code| Description                                                                |
+| ----------------------------- | ---------- | -------------------------------------------------------------------------- |
+| `status/ok`                   | `0x00`     | No error, returned on success.                                             |
+| `status/error/cancelled`      | `0x01`     | Transaction was cancelled, typically by the client.                        |
+| `status/error/unknown`        | `0x02`     | Unknown error.                                                             |
+| `status/error/payload`        | `0x03`     | Client provided an invalid payload.                                        |
+| `status/error/deadline`       | `0x04`     | Deadline expired before the transaction could complete.                    |
+| `status/error/missing`        | `0x05`     | Some requested entity was not found.                                       |
+| `status/error/exists`         | `0x06`     | The entity that a client attempted to create already exists.               |
+| `status/error/permission`     | `0x07`     | Client does not have permission to execute the transaction.                |
+| `status/error/exhausted`      | `0x08`     | Some resource has been exhausted.                                          |
+| `status/error/precondition`   | `0x09`     | Transaction rejected because system is not in state needed for it.         |
+| `status/error/aborted`        | `0x0a`     | Transaction aborted, typically due to concurrency conflict.                |
+| `status/error/range`          | `0x0b`     | Transaction was attempteed outside the valid range.                        |
+| `status/error/unimplemented`  | `0x0c`     | Transaction is not implemented/supported/enabled by the server.            |
+| `status/error/internal`       | `0x0d`     | Some invariant expected by the underlying system has been broken.          |
+| `status/error/unavailable`    | `0x0e`     | Service is currently unavailable.                                          |
+| `status/error/data`           | `0x0f`     | Unrecoverable data loss or corruption.                                     |
+| `status/error/authentication` | `0x10`     | Client does not have valid authentication credentials for the transaction. |
 
 The response type codes between `0x00` and `0x10` correspond exactly to the [status codes defined by gRPC](https://github.com/grpc/grpc/blob/master/doc/statuscodes.md), and the semantics of the gRPC error codes should be the same semantics here.
 
@@ -126,22 +129,37 @@ The response type codes between `0x00` and `0x10` correspond exactly to the [sta
 ##### Request Methods
 `0x40` - `0x5f` are reserved for specification of request methods by phyllo.
 
-| Method         | Method Code| Description                                           |
-| -------------- | ---------- | ----------------------------------------------------- |
-| `method/probe` | `0x40`     | Check whether the specified endpoint and method exist.|
+| Method              | Method Code | Description                                             | REST Equivalent    | Safe | Idempotent |
+| ------------------- | ----------- | ------------------------------------------------------- | ------------------ | ---- | ---------- |
+| `endpoint/methods`  | `0x40`      | Query the methods supported by the endpoint.            | (none)             | Yes  | Yes        |
+| `endpoint/parent`   | `0x41`      | Query the parent endpoints of the endpoint.             | (none)             | Yes  | Yes        |
+| `endpoint/children` | `0x42`      | Query the child endpoints associated with the endpoint. | (none)             | Yes  | Yes        |
+| `rest/read`         | `0x50`      | Query the data represented by the endpoint.             | GET                | Yes  | Yes        |
+| `rest/update`       | `0x51`      | Update the data represented by the endpoint.            | PUT (for updating) | No   | Yes        |
+| `rest/create`       | `0x52`      | Create a new data representation at the endpoint.       | PUT (for creating) | No   | Yes        |
+| `rest/delete`       | `0x53`      | Delete the data represented by the endpoint.            | DELETE             | No   | Yes        |
+| `rest/put`          | `0x54`      | Create or update the data represented by the endpoint.  | PUT                | No   | Yes        |
+| `rest/post`         | `0x54`      | Perform some processing of the request at the endpoint. | POST               | No   | No         |
 
 `0x60` - `0x7f` are reserved for request methods specified by programmers/applications on an ad hoc basis.
 
 #### Transaction ID
-The transaction ID is a sequential unsigned integer, of length up to 64 bits (0 - 2^64-1), which uniquely identifies the transaction which the message belongs to for the client.
+The transaction ID is a sequential unsigned integer, of length up to 64 bits (0 - 2^64-1), which uniquely identifies the transaction which the message belongs to for the client. The transaction ID is represented as a variable-length MessagePack unsigned integer - that is, it can be represented as a positive fixnum, a uint8, a uint16, a uint32, or a uint32.
 
 ### Options
-A MessagePack-serialized document which is exactly one map, where key-value pairs specify options. Each key is an option code represented as a 7-bit number (`0x00` - `0x7f`) and specifies an option.
+The options field is a MessagePack-serialized document which is exactly one map, where key-value pairs specify options. Each key is an option code represented as a 7-bit number (`0x00` - `0x7f`) and specifies an option.
 
-| Option         | Option Code | Description                             |
-| -------------- | ----------- | --------------------------------------- |
-| `payload/type` | `0x00`      | Type code of the payload, if it exists. |
-| `payload/body` | `0x01`      | Body of the payload, if it exists.      |
+| Option                    | Option Code| Description                                                               | In Request| In Response|
+| ------------------------- | ---------- | ------------------------------------------------------------------------- | --------- | ---------- |
+| `payload/type`            | `0x00`     | Type code of the payload, if it exists.                                   | Yes       | Yes        |
+| `payload/body`            | `0x01`     | Body of the payload, if it exists.                                        | Yes       | Yes        |
+| `endpoint/host`           | `0x10`     | Host of associated endpoint.                                              | Yes       | Yes        |
+| `endpoint/port`           | `0x10`     | Host of associated endpoint.                                              | Yes       | Yes        |
+| `endpoint/names`          | `0x10`     | Name of associated endpoint.                                              | Yes       | Yes        |
+| `request/preferred/type`  | `0x20`     | Preferred type of the payload data in the response.                       | Yes       | No         |
+| `request/preferred/format`| `0x21`     | Preferred format of the payload data in the response, if it's a document. | Yes       | No         |
+| `request/preferred/schema`| `0x22`     | Preferred schema of the payload data in the response, if it's a document. | Yes       | No         |
+| `request/preconditions`   | `0x28`     | Preconditions which must be satisfied for the request to be accepted.     | Yes       | No         |
 
 
 #### Sending

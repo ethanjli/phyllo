@@ -23,7 +23,7 @@ The __pub-sub message link__ handles representation of messages.
 - Purpose: Multiplexing of application data over named-topic logical channels.
 - Payload demultiplexing keys: topic
 - Length overhead: between 3 bytes and 18 bytes, depending on the length of the topic name
-- Payload maximum length: determined by payload length limits of layers underneath
+- Payload maximum length: determined by payload length limits of layers underneath and length of topic name
 - Services required from below:
     - Byte buffer exchange
 - Services provided for above:
