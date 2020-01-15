@@ -1,6 +1,6 @@
 # Remote Procedure Calls
 
-The phyllo __RPC framework__ enables an application structured as a client/server pair to communicate by request/response transactions over a publish-subscribe messaging framework stack. The _client_ calls a _method_ running on a _server_, which in return sends some data to the client.
+The phyllo __RPC framework__ enables an application structured as a client/server pair to communicate by request/response transactions over a publish-subscribe messaging framework stack. The _client_ calls a _method_ at an _endpoint_ on a _server_, which in return sends some data to the client.
 
 
 ## Basic Description
@@ -9,60 +9,64 @@ The phyllo __RPC framework__ enables an application structured as a client/serve
 - Purpose: Service interface for client-server communication based on requests and responses.
 
 
-## Request/Response Transactions
+## RPC Messages
 
-The __transaction link__ handles representation of RPC request-response transactions in pub-sub messages. A pub-sub message's topic name is the endpoint which specifies the transaction method, while the message's payload specifies other transaction data. An RPC service may control multiple endpoints, and an RPC client may access multiple endpoints. Each service is a logical grouping of related endpoints.
+The __RPC message link__ handles representation of RPC request-response transaction messages. An RPC service may control multiple endpoints, each of which may have multiple methods, and an RPC client may call multiple methods at multiple endpoints. Each endpoint is a logical grouping of related methods, and each service is a logical grouping of related endpoints.
 
 ### Basic Description
 
-- Data unit name: Transaction
-- Data unit type: Message document
-- Payload type: request/response data (serialized body or specific data structure or generic document tree)
-- Document serialization format name: 'binary/dynamic/msgpack'
-- Document serialization format code: `0x00`
-- Document schema type: `framework/rpc/phyllo`
-- Document schema code: `0x51`
-- Purpose: Representation of request/response data.
+- Data unit name: RPC Message
+- Payload type: byte buffer
+- Layer name: RPC Message Link
+- Protocol type: `application/rpc`
+- Protocol type code: `0x61`
+- Purpose: Representation of RPC transaction request/response data.
 - Services required from below:
-    - Structured data exchange
-    - Name-based multiplexing
+    - Byte buffer exchange
 - Services provided for above:
-    - Request-response structured data exchange
-
-Messages are serialized on embedded devices in the MessagePack format and on computers in the JSON format.
+    - Byte buffer exchange
+    - Request-response transactions with endpoints and methods
+    - Streaming requests and responses
 
 ### Service Interface
 
 
 ### Peer Interface
 
-Each unit of structured data exchanged due to the service interface is exchanged as the serialized payload of a pub-sub message, together with a topic:
+Each byte buffer exchanged due to the service interface is exchanged as the payload of a request or a response associated with a transaction, together with an endpoint, a method, and other metadata:
 
-- Transaction Request message: 4-element array
-    - Type: transaction message type code, `0x10` (the request is completed with the message) or `0x2f` (more messages are forthcoming as part of the request)
-    - Channel ID
+- RPC Message:
+    - Type: transaction message type code
+    - Method/Status: transaction message method/status code
     - Transaction ID
-    - Metadata: `None` by default or else defined by the RPC service.
-    - Arguments: serialized document of client application data represented as raw bytes, arbitrary length (limited by payload size limit of lower layers).
+    - Options
+
+- RPC transaction request:
+    - Type: transaction message type code, `0x10` (the request is completed with the message) or `0x2f` (more messages are forthcoming as part of the request)
+    - Method: a byte of value between `0x40` and `0x7f`
+    - Transaction ID
+    - Options
 
 - Transaction Response message: 4-element array
     - Type: transaction message type code, `0x20` (the response is successful and is completed with the message) or `0x21` - `0x30` (an error was encountered and the message is the final one of the response) or `0x3f` (more messages are forthcoming as part of the response)
-    - Channel ID
+    - Status: a byte of value between `0x00` and `0x3f`
     - Transaction ID
-    - Metadata: `None` by default or else defined by the RPC service.
-    - Result: serialized document of client application data represented as raw bytes, arbitrary length (limited by payload size limit of lower layers). If the return status is not `ok`, then this may contain data about the error which happened.
+    - Options
 
-- Transaction Acknowledgement message:
+- Transaction Explicit Acknowledgement message:
     - Type: transaction message type code, `0x09`
-    - Transaction ID
+    - Method/Status: a byte of value between `0x00` and `0x7f`, should match the message being acknowledged
+    - Transaction ID: ???, should match the transaction ID of the message being acknowledged
 
 - Transaction Keepalive message:
     - Type: transaction message type code, `0x0a`
-    - Transaction ID
+    - Method/Status: a byte of value between `0x00` and `0x7f`, should match the original request which the keepalive is associated with
+    - Transaction ID: ???, should match the transaction ID of the original request which the keepalive is associated with
 
 - Transaction Cancellation message:
     - Type: transaction message type code, `0x0b`
-    - Transaction ID
+    - Method/Status: a byte of value between `0x00` and `0x7f`, should match the original request which is being cancelled
+    - Transaction ID: ???, should match the transaction ID of the original request which is being cancelled
 
 
 #### Transaction Message Type Code
@@ -83,37 +87,61 @@ Normally, the type field specifies the transaction message type and is a 7-bit u
 | `layer/keepalive`         | `0x0a`    | Transaction Keepalive message                                              |
 | `layer/cancel`            | `0x0b`    | Transaction Cancellation message                                           |
 | `request/complete`        | `0x10`    | Transaction Request partial message                                        |
-| `request/partial`         | `0x2f`    | Transaction Request message                                                |
-| `response/complete`       | `0x30`    | No error, returned on success.                                             |
-| `response/cancelled`      | `0x31`    | Transaction was cancelled, typically by the client.                        |
-| `response/unknown`        | `0x32`    | Unknown error.                                                             |
-| `response/argument`       | `0x33`    | Client specified an invalid argument.                                      |
-| `response/deadline`       | `0x34`    | Deadline expired before the transaction could complete.                    |
-| `response/missing`        | `0x35`    | Some requested entity was not found.                                       |
-| `response/exists`         | `0x36`    | The entity that a client attempted to create already exists.               |
-| `response/permission`     | `0x37`    | Client does not have permission to execute the transaction.                |
-| `response/exhausted`      | `0x38`    | Some resource has been exhausted.                                          |
-| `response/precondition`   | `0x39`    | Transaction rejected because system is not in state needed for it.         |
-| `response/aborted`        | `0x3a`    | Transaction aborted, typically due to concurrency conflict.                |
-| `response/range`          | `0x3b`    | Transaction was attempteed outside the valid range.                        |
-| `response/unimplemented`  | `0x3c`    | Transaction is not implemented/supported/enabled by the server.            |
-| `response/internal`       | `0x3d`    | Some invariant expected by the underlying system has been broken.          |
-| `response/unavailable`    | `0x3e`    | Service is currently unavailable.                                          |
-| `response/data`           | `0x3f`    | Unrecoverable data loss or corruption.                                     |
-| `response/authentication` | `0x30`    | Client does not have valid authentication credentials for the transaction. |
-| `response/partial`        | `0x4f`    | Transaction Response partial message                                       |
+| `request/partial`         | `0x11`    | Transaction Request message                                                |
+| `response/complete`       | `0x20`    | No error, returned on success.                                             |
+| `response/partial`        | `0x21`    | Transaction Response partial message                                       |
 
+#### Method/Status Code
+The method/status field is used to specify the RPC method to call in the request, or the status of the method in the response.
 
-The response type codes between `0x20` and `0x30` correspond exactly to the [status codes defined by gRPC](https://github.com/grpc/grpc/blob/master/doc/statuscodes.md) but with `0x20` added to the numerical values of the gRPC status codes, and the semantics of the gRPC error codes should be the same semantics here.
+##### Response Statuses
+`0x00` - `0x1f` are reserved for specification of response statuses by phyllo:
 
-#### Channel ID
-The channel ID is a sequential unsigned integer, of length up to 4 bits (`0x00` - `0x0f`), which assigns a logical channel in the endpoint within which request/response transactions are sequential, such that at most one transaction is active per channel per endpoint at any given time.
+| Status                  | Status Code| Description                                                               |
+| ----------------------- | ---------- | ------------------------------------------------------------------------- |
+| `status/ok`             | `0x00`     | No error, returned on success.                                            |
+| `status/cancelled`      | `0x01`     | Transaction was cancelled, typically by the client.                       |
+| `status/unknown`        | `0x02`     | Unknown error.                                                            |
+| `status/argument`       | `0x03`     | Client specified an invalid argument.                                     |
+| `status/deadline`       | `0x04`     | Deadline expired before the transaction could complete.                   |
+| `status/missing`        | `0x05`     | Some requested entity was not found.                                      |
+| `status/exists`         | `0x06`     | The entity that a client attempted to create already exists.              |
+| `status/permission`     | `0x07`     | Client does not have permission to execute the transaction.               |
+| `status/exhausted`      | `0x08`     | Some resource has been exhausted.                                         |
+| `status/precondition`   | `0x09`     | Transaction rejected because system is not in state needed for it.        |
+| `status/aborted`        | `0x0a`     | Transaction aborted, typically due to concurrency conflict.               |
+| `status/range`          | `0x0b`     | Transaction was attempteed outside the valid range.                       |
+| `status/unimplemented`  | `0x0c`     | Transaction is not implemented/supported/enabled by the server.           |
+| `status/internal`       | `0x0d`     | Some invariant expected by the underlying system has been broken.         |
+| `status/unavailable`    | `0x0e`     | Service is currently unavailable.                                         |
+| `status/data`           | `0x0f`     | Unrecoverable data loss or corruption.                                    |
+| `status/authentication` | `0x10`     | Client does not have valid authentication credentials for the transaction.|
+
+The response type codes between `0x00` and `0x10` correspond exactly to the [status codes defined by gRPC](https://github.com/grpc/grpc/blob/master/doc/statuscodes.md), and the semantics of the gRPC error codes should be the same semantics here.
+
+`0x11` - `0x1f` are reserved for future specification or allocation by phyllo.
+
+`0x20` - `0x3f` are available for response statuses specified by programmers/applications on an ad hoc basis.
+
+##### Request Methods
+`0x40` - `0x5f` are reserved for specification of request methods by phyllo.
+
+| Method         | Method Code| Description                                           |
+| -------------- | ---------- | ----------------------------------------------------- |
+| `method/probe` | `0x40`     | Check whether the specified endpoint and method exist.|
+
+`0x60` - `0x7f` are reserved for request methods specified by programmers/applications on an ad hoc basis.
 
 #### Transaction ID
-The transaction ID is a sequential unsigned integer, of length up to 32 bits (0 - 2^32-1), which uniquely identifies the transaction which the message belongs to in the given channel.
+The transaction ID is a sequential unsigned integer, of length up to 64 bits (0 - 2^64-1), which uniquely identifies the transaction which the message belongs to for the client.
 
-#### End of Stream
-This is a boolean flag specifying whether the peer should expect more messages forthcoming as part of the request/response.
+### Options
+A MessagePack-serialized document which is exactly one map, where key-value pairs specify options. Each key is an option code represented as a 7-bit number (`0x00` - `0x7f`) and specifies an option.
+
+| Option         | Option Code | Description                             |
+| -------------- | ----------- | --------------------------------------- |
+| `payload/type` | `0x00`      | Type code of the payload, if it exists. |
+| `payload/body` | `0x01`      | Body of the payload, if it exists.      |
 
 
 #### Sending

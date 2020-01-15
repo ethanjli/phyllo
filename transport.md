@@ -76,6 +76,8 @@ The __chunked stream link__ delimits byte buffer consisting of non-null bytes, b
 - Protocol type code: `0x12`
 - Purpose: Delimited exchange of buffers of non-null bytes, using null bytes as delimiters.
 - Payload demultiplexing key: none
+- Length overhead: 2 bytes
+- Payload maximum length: none, though the maximum length of payload and overhead is recommended to be a multiple of 64 bytes for efficiency of maximum-length transmissions over USB serial connections.
 - Services required from below:
     - Byte stream connection
 - Services provided for above:
@@ -132,6 +134,8 @@ The __frame link__ enables exchange of byte buffers with arbitrary contents over
 - Protocol type code: `0x20`
 - Purpose: Encoding of buffers of arbitrary bytes to remove null bytes.
 - Payload demultiplexing key: none
+- Length overhead: 1 byte
+- Payload maximum length: at most 254 bytes, though it may be smaller due to payload length limits of layers underneath
 - Services required from below:
     - Non-null byte buffer exchange
 - Services provided for above:
@@ -190,6 +194,8 @@ The __datagram link__ provides multiplexing and demultiplexing of multiple proto
 - Protocol type code: `0x21`
 - Purpose: Multiplexing of multiple communication protocols over a point-to-point link.
 - Payload demultiplexing key: protocol type code
+- Length overhead: 2 bytes
+- Payload maximum length: determined by payload length limits of layers underneath
 - Services required from below:
     - Byte buffer exchange
 - Services provided for above:
@@ -257,6 +263,8 @@ The __validated datagram link__ provides sophisticated error-checking with a [cy
 - Protocol type code: `0x22`
 - Purpose: Error checking of payload contents and type.
 - Payload demultiplexing key: protocol type code
+- Length overhead: 5 bytes
+- Payload maximum length: determined by payload length limits of layers underneath
 - Services required from below:
     - Byte buffer exchange
     - Protocol type multiplexing
@@ -292,7 +300,7 @@ Each byte buffer exchanged due to the service interface is exchanged as a payloa
 | __Length__   | 4                     | 1                          | ...          |
 | __Contents__ | Protected Section CRC | Payload Protocol Type Code | Buffer bytes |
 
-The CRC field specifies the computed 32-bit CRC of the protected section (consisting of the type field and the payload) and is represented as a big-endian 32-bit number. The type field specifies the protocol which should be used to handle the payload and is represented as a single byte (`0x00` - `0xff`). The CRC field allows for detection of data corruption in the type or payload, as a comprehensive form of error detection. The 32-bit CRC is computed using polynomial `0x000001ed` ([Ray32sub8](https://users.ece.cmu.edu/~koopman/pubs/ray06_crcalgorithms.pdf), which is exceptionally fast and computational cost similar to a normal CRC16 computation by the precomputed table lookup algorithm. The CRC parameters are as follows:
+The CRC field specifies the computed 32-bit CRC of the protected section (consisting of the type field and the payload) and is represented as a big-endian 32-bit number in network byte order (big-endian). The type field specifies the protocol which should be used to handle the payload and is represented as a single byte (`0x00` - `0xff`). The CRC field allows for detection of data corruption in the type or payload, as a comprehensive form of error detection. The 32-bit CRC is computed using polynomial `0x000001ed` ([Ray32sub8](https://users.ece.cmu.edu/~koopman/pubs/ray06_crcalgorithms.pdf), which is exceptionally fast and computational cost similar to a normal CRC16 computation by the precomputed table lookup algorithm. The CRC parameters are as follows:
 
 - Width: 32 bits
 - Polynomial: `0x000001ed`
@@ -336,6 +344,8 @@ WARNING: the speciication for the reliable buffer link is not yet finalized and 
 - Protocol type code: `0x23`
 - Purpose: Reliable exchange of byte buffers.
 - Payload demultiplexing key: protocol type code
+- Length overhead: minimum of 4 bytes, longer if an extended header is included
+- Payload maximum length: determined by payload length limits of layers underneath
 - Services required from below:
     - Byte buffer exchange
     - Protocol type multiplexing
@@ -430,6 +440,8 @@ WARNING: the speciication for the ported buffer link is not yet finalized and ma
 - Protocol type code: `0x24`
 - Purpose: Multiplexing of byte buffer channels between different applications.
 - Payload demultiplexing key: (sender port, receiver port) pair
+- Length overhead: 2 bytes, longer if an extended header is included
+- Payload maximum length: determined by payload length limits of layers underneath
 - Services required from below:
     - Byte buffer exchange
     - Protocol type multiplexing
