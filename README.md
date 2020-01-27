@@ -9,9 +9,9 @@ This repository manages specification of the phyllo protocol suite and applicati
 
 ## Design
 
-Phyllo is a communication protocol suite consisting of __layers__ which can be mixed-and-matched to suit the service requirements and computational capabilities of hosts, ranging from 8-bit microcontrollers to computers. To support such interoperability, each layer of a communication protocol is designed to be stackable on various other phyllo layers; each such layer is called a __link__, in the general sense of a [data link](https://en.wikipedia.org/wiki/Data_link) which connects one location to another to transmit and receive digital information between the two locations.
+Phyllo is a communication protocol suite consisting of transport- and application-level __layers__ which can be mixed and matched to suit the service requirements and computational capabilities of hosts, ranging from _extremely constrained devices_ such as 8-bit microcontrollers (e.g. Arduino Uno or Micro with as low as 2 KB of RAM, 32 KB of flash memory, and 16 MHz clock speed) to _constrained devices_ such as most 32-bit microcontrollers (e.g. Teensy LC with approx. 8 KB of RAM, 64 KB of flash memory, and 48 MHz clock speed) to _unconstrained devices_ such as certain 32-bit microcontrollers (e.g. Teensy 4.0 with 1 MB of RAM, 2 MB of flash memory, and 600 MHz clock speed) or computers. To support such interoperability, each layer of a communication protocol is designed to be stackable on various other phyllo layers; each such layer is called a __link__, in the general sense of a [data link](https://en.wikipedia.org/wiki/Data_link) which connects one location to another to transmit and receive digital information between the two locations.
 
-Phyllo layers are designed such that that they can be decoupled from each other and grafted onto other protocol libraries, whether for transport layer communication or application layer frameworks. If you want to bring your own portion of the communication protocol stack or application framework stack, it should generally be possible to use it with phyllo layers to supply any additional desired functionality.
+Phyllo layers are designed such that that they can be decoupled from each other and dropped onto other protocol libraries, whether for transport layer communication or application layer frameworks. If you want to bring your own portion of the communication protocol stack or application framework stack, it should generally be possible to use it with phyllo layers to supply any additional desired functionality.
 
 ### Transport
 
@@ -106,8 +106,13 @@ There are too many libraries to list which enable data exchange on embedded devi
 
 ### Application
 
-The following libraries also specify application frameworks based on message exchange on embedded devices:
+The following libraries specify application frameworks based on message exchange on embedded devices:
 
 - [ModuleInterface](https://github.com/fredilarsen/ModuleInterface) provides a framework to synchronize variable values over a PJON connection.
 - [Telemetry](https://github.com/Overdrivr/Telemetry/wiki) provides a pub-sub messaging framework over serial or Bluetooth to send simple messages from computers or embedded devices or to send updated values to variables on embedded devices. However, the project is currently inactive, and there does not appear to be an easy way to guarantee reliable transmission over the communication link.
 - [Arduino-SerialCommand](https://github.com/kroimon/Arduino-SerialCommand) and its forks are very simple libraries which allow registering callback functions to string commands.
+
+The following are application protocols based on message exchange on constrained devices, but are designed for internet networking rather than a point-to-point link:
+
+- The [Constrained Application Protocol](https://en.wikipedia.org/wiki/Constrained_Application_Protocol) (CoAP) specifies a protocol for constrained devices to provide a RESTful interface (analogous to phyllo's Resource Application Framework), but between devices joined by networks such as the internet.
+- The [OMA Lightweight M2M](https://en.wikipedia.org/wiki/OMA_LWM2M) (OMA LwM2M) specifies a protocol for management and data exchange of constrained devices over networks.

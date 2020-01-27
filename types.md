@@ -65,7 +65,7 @@ Each protocol has a one-byte numerical type code associated with it. When a type
 
 `0x50` - `0x5f` are allocated for presentation-level messages specified by programmers/applications on an ad hoc basis.
 
-### Application
+### Application Frameworks
 
 `0x60` - `0x6f` are reserved for byte buffer payloads representing phyllo-specified application framework data units:
 
@@ -77,11 +77,9 @@ Each protocol has a one-byte numerical type code associated with it. When a type
 
 `0x63` - `0x6f` are reserved for future specification by phyllo.
 
-`0x70` - `0x7f` are allocated for presentation-level messages specified by programmers/applications on an ad hoc basis.
-
 ### Reserved
 
-`0x80` - `0xff` are reserved for future specification/allocation by phyllo.
+`0x70` - `0xff` are reserved for future specification/allocation by phyllo.
 
 
 ## Document Serialization Formats
@@ -113,12 +111,13 @@ Each document serialization format has an associated serialization format code. 
 #### Dynamically Typed
 `0x00` - `0x0f` are reserved for phyllo-specified binary dynamically-typed formats:
 
-| Protocol Type            | Format Code | Name        |
-| ------------------------ | ----------- | ----------- |
-| `binary/dynamic/msgpack` | `0x10`      | MessagePack |
-| `binary/dynamic/cbor`    | `0x11`      | CBOR        |
-| `binary/dynamic/bson`    | `0x12`      | BSON        |
-| `binary/dynamic/avro`    | `0x13`      | Avro        |
+| Protocol Type            | Format Code | Name                       |
+| ------------------------ | ----------- | -------------------------- |
+| `binary/dynamic/unknown` | `0x10`      | Unknown (undefined format) |
+| `binary/dynamic/msgpack` | `0x11`      | MessagePack                |
+| `binary/dynamic/cbor`    | `0x12`      | CBOR                       |
+| `binary/dynamic/bson`    | `0x13`      | BSON                       |
+| `binary/dynamic/avro`    | `0x14`      | Avro                       |
 
 `0x14` - `0x1f` are reserved for future specification by phyllo.
 
