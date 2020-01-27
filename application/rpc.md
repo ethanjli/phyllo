@@ -20,10 +20,10 @@ The __RPC message link__ handles representation of RPC request-response transact
 - Layer name: RPC Message Link
 - Protocol type: `application/rpc`
 - Protocol type code: `0x61`
-- Purpose: Representation of RPC transaction request/response data.
+- Purpose: Representation of RPC transaction requests and responses.
 - Payload demultiplexing keys: topic
 - Length overhead: at least 3 bytes, depending on the length of the transaction ID and the RPC message options
-- Payload maximum length: determined by payload length limits of layers underneath, length of transaction ID, RPC message options
+- Payload maximum length: determined by payload length limits of layers underneath, length of transaction ID, and RPC message options
 - Services required from below:
     - Byte buffer exchange
 - Services provided for above:
@@ -73,7 +73,7 @@ Each byte buffer exchanged due to the service interface is exchanged as the payl
 
 
 #### Transaction Message Type Code
-Normally, the type field specifies the transaction message type and is a 7-bit unsigned integer (`0x00` - `0x8f`). If the type of the payload is between `0x00` and `0x0f`, then the message is actually a layer protocol message used internally by the RPC framework. Messages with such types do not contain application data and thus should not be exposed by the service interface to higher layers as normal data; then the structure of the body's internal layer data is implicitly defined by the pub-sub messaging framework.
+Normally, the type field specifies the transaction message type and is an 8-bit unsigned integer (`0x00` - `0xff`). If the type of the payload is between `0x00` and `0x0f`, then the message is actually a layer protocol message used internally by the RPC framework. Messages with such types do not contain application data and thus should not be exposed by the service interface to higher layers as normal data; then the structure of the body's internal layer data is implicitly defined by the pub-sub messaging framework.
 
 | Message Type              | Type Code | Description                                                                |
 | ------------------------- | --------- | -------------------------------------------------------------------------- |
@@ -129,37 +129,40 @@ The response type codes between `0x00` and `0x10` correspond exactly to the [sta
 ##### Request Methods
 `0x40` - `0x5f` are reserved for specification of request methods by phyllo.
 
-| Method              | Method Code | Description                                             | REST Equivalent    | Safe | Idempotent |
-| ------------------- | ----------- | ------------------------------------------------------- | ------------------ | ---- | ---------- |
-| `endpoint/methods`  | `0x40`      | Query the methods supported by the endpoint.            | (none)             | Yes  | Yes        |
-| `endpoint/parent`   | `0x41`      | Query the parent endpoints of the endpoint.             | (none)             | Yes  | Yes        |
-| `endpoint/children` | `0x42`      | Query the child endpoints associated with the endpoint. | (none)             | Yes  | Yes        |
-| `rest/read`         | `0x50`      | Query the data represented by the endpoint.             | GET                | Yes  | Yes        |
-| `rest/update`       | `0x51`      | Update the data represented by the endpoint.            | PUT (for updating) | No   | Yes        |
-| `rest/create`       | `0x52`      | Create a new data representation at the endpoint.       | PUT (for creating) | No   | Yes        |
-| `rest/delete`       | `0x53`      | Delete the data represented by the endpoint.            | DELETE             | No   | Yes        |
-| `rest/put`          | `0x54`      | Create or update the data represented by the endpoint.  | PUT                | No   | Yes        |
-| `rest/post`         | `0x54`      | Perform some processing of the request at the endpoint. | POST               | No   | No         |
+| Method               | Method Code| Description                                                     | REST Equivalent   | Safe | Idempotent |
+| -------------------- | ---------- | --------------------------------------------------------------- | ----------------- | ---- | ---------- |
+| `endpoint/methods`   | `0x40`     | Query the methods supported by the endpoint.                    | (none)            | Yes  | Yes        |
+| `endpoint/parent`    | `0x41`     | Query the parent endpoints of the endpoint.                     | (none)            | Yes  | Yes        |
+| `endpoint/children`  | `0x42`     | Query the child endpoints associated with the endpoint.         | (none)            | Yes  | Yes        |
+| `rest/read`          | `0x50`     | Query the data represented by the endpoint.                     | GET               | Yes  | Yes        |
+| `rest/update`        | `0x51`     | Update the data represented by the endpoint.                    | PUT (for updating)| No   | Yes        |
+| `rest/create`        | `0x52`     | Create a new data representation at the endpoint.               | PUT (for creating)| No   | Yes        |
+| `rest/delete`        | `0x53`     | Delete the data represented by the endpoint.                    | DELETE            | No   | Yes        |
+| `rest/put`           | `0x54`     | Create or update the data represented by the endpoint.          | PUT               | No   | Yes        |
+| `rest/post`          | `0x55`     | Perform some processing of the request at the endpoint.         | POST              | No   | No         |
+| `observe/subscribe`  | `0x60`     | Observe updates to the data represented by the endpoint.        | (none)            | Yes  | Yes        |
+| `observe/unsubscribe`| `0x61`     | Stop observing updates to the data represented by the endpoint. | (none)            | Yes  | Yes        |
+| `observe/notify`     | `0x62`     | Send an update of the data represented by the endpoint.         | (none)            | Yes  | Yes        |
 
 `0x60` - `0x7f` are reserved for request methods specified by programmers/applications on an ad hoc basis.
 
 #### Transaction ID
-The transaction ID is a sequential unsigned integer, of length up to 64 bits (0 - 2^64-1), which uniquely identifies the transaction which the message belongs to for the client. The transaction ID is represented as a variable-length MessagePack unsigned integer - that is, it can be represented as a positive fixnum, a uint8, a uint16, a uint32, or a uint32.
+The transaction ID is a sequential unsigned integer, of length up to 32 bits (0 - 2^32-1), which uniquely identifies the transaction which the message belongs to for the client. The transaction ID is represented as a variable-length MessagePack unsigned integer - that is, it can be represented as a positive fixnum, a uint8, a uint16, or a uint32.
 
 ### Options
-The options field is a MessagePack-serialized document which is exactly one map, where key-value pairs specify options. Each key is an option code represented as a 7-bit number (`0x00` - `0x7f`) and specifies an option.
+The options field is a MessagePack-serialized document which is exactly one map, whose key-value pairs specify options. Each key is an option code represented as a 7-bit number (`0x00` - `0x7f`) and specifies an option.
 
-| Option                    | Option Code| Description                                                               | In Request| In Response|
-| ------------------------- | ---------- | ------------------------------------------------------------------------- | --------- | ---------- |
-| `payload/type`            | `0x00`     | Type code of the payload, if it exists.                                   | Yes       | Yes        |
-| `payload/body`            | `0x01`     | Body of the payload, if it exists.                                        | Yes       | Yes        |
-| `endpoint/host`           | `0x10`     | Host of associated endpoint.                                              | Yes       | Yes        |
-| `endpoint/port`           | `0x10`     | Host of associated endpoint.                                              | Yes       | Yes        |
-| `endpoint/names`          | `0x10`     | Name of associated endpoint.                                              | Yes       | Yes        |
-| `request/preferred/type`  | `0x20`     | Preferred type of the payload data in the response.                       | Yes       | No         |
-| `request/preferred/format`| `0x21`     | Preferred format of the payload data in the response, if it's a document. | Yes       | No         |
-| `request/preferred/schema`| `0x22`     | Preferred schema of the payload data in the response, if it's a document. | Yes       | No         |
-| `request/preconditions`   | `0x28`     | Preconditions which must be satisfied for the request to be accepted.     | Yes       | No         |
+| Option                    | Option Code| Description                                                               | In Request | In Response |
+| ------------------------- | ---------- | ------------------------------------------------------------------------- | ---------- | ----------- |
+| `payload/type`            | `0x00`     | Type code of the payload, if it exists.                                   | Yes        | Yes         |
+| `payload/body`            | `0x01`     | Body of the payload, if it exists.                                        | Yes        | Yes         |
+| `endpoint/name`           | `0x10`     | Name of associated endpoint.                                              | Yes        | Yes         |
+| `endpoint/port`           | `0x11`     | Port of associated endpoint (if multi-port configuration).                | Yes        | Yes         |
+| `endpoint/host`           | `0x12`     | Host of associated endpoint (if multi-host configuration).                | Yes        | Yes         |
+| `request/preferred/type`  | `0x20`     | Preferred type of the payload data in the response.                       | Yes        | No          |
+| `request/preferred/format`| `0x21`     | Preferred format of the payload data in the response, if it's a document. | Yes        | No          |
+| `request/preferred/schema`| `0x22`     | Preferred schema of the payload data in the response, if it's a document. | Yes        | No          |
+| `request/preconditions`   | `0x28`     | Preconditions which must be satisfied for the request to be accepted.     | Yes        | No          |
 
 
 #### Sending
