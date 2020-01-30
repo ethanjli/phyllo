@@ -52,7 +52,7 @@ Phyllo provides frameworks to write client/server application programs with requ
 
 Currently, the following implementations exist:
 
-- A C++ library providing a standard protocol implementation and application framework for embedded devices, along with an I/O layer for serial communication in the Arduino framework. This implementation heavily uses the [Embedded Template Library](https://www.etlcpp.com/).
+- [Phyllo-cpp](https://github.com/ethanjli/phyllo-cpp): a C++ library providing a standard protocol implementation and application framework for embedded devices, along with an I/O layer for serial communication in the Arduino framework. This implementation heavily uses the [Embedded Template Library](https://www.etlcpp.com/).
 - A Python library providing a standard protocol implementation and application framework for computers, along with an I/O layer for various communication I/O implementations. The protocol implementation has a [Sans I/O](https://sans-io.readthedocs.io/)-based design.
 
 
@@ -65,8 +65,9 @@ Currently, phyllo does:
 - Specify a way (DatagramLink) to transport up to 252-byte arbitrary datagram payloads over a FrameLink.
 - Specify a way (ValidatedDatagramLink) to transport up to 247-byte arbitrary validated datagram payloads over a DatagramLink with an exceptionally fast 32-bit CRC using polynomial 0x000001ED ([Ray32sub8](https://users.ece.cmu.edu/~koopman/pubs/ray06_crcalgorithms.pdf), with computational cost similar to a normal CRC16 computation) guaranteeing that any data transmission errors of up to 5 bits per datagram (i.e. HD=6) will be caught, and that any data transmission errors of up to 7 bits per datagram (i.e. HD=8) will be caught for datagram payloads of up to 99 bytes.
 - Partially specify a way (ReliableBufferLink) to reliably transmit up to 243-byte arbitrary byte buffer payloads over a ValidatedDatagramLink.
-- Specify a way (DocumentLink) to efficiently encode and transmit small unstructured documents, using [MessagePack](https://msgpack.org/index.html). A document is equivalent to a JSON number/string/array/object or a Python number/string/list/tuple/dict.
-- Specify a way (MessageLink) for publish-subscribe messaging to exchange documents over independent logical channels by channel name.
+- Specify a way (Presentation DocumentLink) to efficiently encode and transmit small structured documents, using [MessagePack](https://msgpack.org/index.html). A document is equivalent to a JSON boolean/null/number/string/array/object or a Python boolean/none/number/string/list/tuple/dict.
+- Specify a way (Pub-Sub MessageLink) for publish-subscribe messaging to exchange data over independent logical channels by channel name.
+- Specify a way (Pub-Sub DocumentLink) for publish-subscribe messaging to exchange documents over independent logical channels by channel name.
 
 Currently, phyllo does not yet:
 
