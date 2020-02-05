@@ -108,14 +108,48 @@ Named-topic structured data interface:
 The peer interface is exactly the same as that of the presentation document link. The topic is transparently passed to/from the underlying pub-sub message link.
 
 
+## Endpoint
+
+An __endpoint__ defines a filter which sits on top of a pub-sub document link and passes documents which match a topic name filter.
+
+### Service Interface
+
+Endpoint interface:
+
+- __has receive__ to check whether a pub-sub document has been received at the endpoint from the other peer with a matching topic name and is ready to be consumed.
+- __receive__ to consume the received pub-sub document.
+- __send__ a document on the topic name associated with the endpoint.
+
+
+## Endpoint Handler
+
+The __endpoint handler__ interface defines a pub-sub document interface which sits on top of a pub-sub document link and can send and receive documents on certain endpoints.
+
+### Service Interface
+
+Endpoint handler interface:
+
+- __receive__ to handle a received pub-sub document arbitarily.
+
+
+## Single Endpoint Handler
+
+The __single-endpoint handler__ inteface defines a Endpoint Handler event-driven observer interface which sits on top of a pub-sub document link and handles all documents on exactly one Endpoint.
+
+### Service Interface
+
+Single-endpoint handler interface:
+
+- __on_receive__ to handle a document received on the associated endpoint.
+- __send__ a document on the associated endpoint.
+
+
 ## Router
 
-The __message router__ provides an event-driven observer interface on top of a pub-sub message link or pub-sub document link.
+The __message router__ provides an event-driven observer interface on top of a pub-sub document link.
 
 ### Service Interface
 
 Named-topic observer interface:
 
-- __subscribe__ an observer callback to handle any data (and their associated topics) on all topics.
-- __subscribe__ an observer callback to handle any data (and their associated topics) on the specified topic.
-- __subscribe__ an observer callback to handle any data (and their associated topics) on all topics with the specified prefix.
+- __subscribe__ an Endpoint Handler to receive pub-sub documents.
